@@ -42,14 +42,16 @@ export const useStore = create((set, get) => ({
       });
     },
     updateNodeField: (nodeId, fieldName, fieldValue) => {
+      const nodes = get().nodes || [];
+      const target = nodes.find((n) => n.id === nodeId);
+      if (!target) return;
+      const current = (target.data && target.data[fieldName]) ?? undefined;
+      if (current === fieldValue) return;
+
       set({
-        nodes: get().nodes.map((node) => {
-          if (node.id === nodeId) {
-            node.data = { ...node.data, [fieldName]: fieldValue };
-          }
-  
-          return node;
-        }),
+        nodes: nodes.map((node) =>
+          node.id === nodeId ? { ...node, data: { ...(node.data || {}), [fieldName]: fieldValue } } : node
+        ),
       });
     },
   }));
